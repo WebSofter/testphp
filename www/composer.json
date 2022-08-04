@@ -1,0 +1,25 @@
+{
+    "name": "test/project",
+    "description": "Test Project",
+    "keywords": ["test", "crypto", "php"],
+    "homepage": "https://github.com/websofter",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "WebSofter",
+            "homepage": "https://wsofter.com/"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"App\\": "src/"}
+    },
+
+    "require": {
+        "psr/log": "1.1.*",
+        "doctrine/orm": "^2.11.0",
+        "doctrine/dbal": "^3.2",
+        "doctrine/annotations": "1.13.2",
+        "symfony/yaml": "^5.4",
+        "symfony/cache": "^5.4"
+    }   
+}

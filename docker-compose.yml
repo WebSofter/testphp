@@ -1,0 +1,89 @@
+version: '3.3'
+services:
+
+  # php:
+  #   image: php:8-apache
+  #   ports:
+  #     - 95:80
+  #   volumes:
+  #     - ./www:/www
+  test_web:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    container_name: test_web
+    volumes:
+      - ./docker/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      - ./www:/www
+    env_file: .env
+    #ports:
+    #  - 95:80
+    depends_on:
+      - test_mysql
+    networks:
+      - test-network
+
+  test_nginx:
+    image: nginx:latest
+    container_name: test_nginx
+    volumes:
+      - ./docker/nginx:/etc/nginx/conf.d
+      - ./www:/www
+    env_file: .env
+    ports:
+      - 87:80
+    links:
+      - test_web
+    networks:
+      - test-network
+
+  test_phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: test_pma
+    environment:
+      PMA_HOST: test_mysql
+    depends_on:
+      - test_mysql
+    ports:
+        - 84:80
+    networks:
+      - test-network
+
+  # test_adminer:
+  #   image: adminer
+  #   container_name: spa_adminer
+  #   ports:
+  #     - 8080:8080
+  #   links:
+  #    - db 
+
+  test_mysql:
+    #image: mariadb
+    build:
+      context: .
+      dockerfile: ./docker/mysql/Dockerfile
+    container_name: test_mysql
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: $MYSQL_DB
+      MYSQL_USER: $MYSQL_USER
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      #MYSQL_ROOT_HOST: '%' #For external access. Uncommet, if you need
+    restart: always
+    ports:
+      - '3308:3306'
+    networks:
+      - test-network
+
+volumes:
+  test_mysql:
+  test_web:
+  test_nginx:
+    driver: local
+
+networks:
+  test-network:
+    driver: bridge
